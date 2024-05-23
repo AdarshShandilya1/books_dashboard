@@ -9,6 +9,7 @@ const MainContent = () => {
   const [noPages, setNoPages] = useState(1);
   const [booksToShow, setBooksToShow] = useState([]);
   const [curPage, setCurPage] = useState(0);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -74,7 +75,7 @@ const MainContent = () => {
   useEffect(() => {
     calculateNoPages();
     insertBooksToShow();
-  }, [pages, curPage, bookData]);
+  }, [pages, curPage, bookData, sortConfig]);
 
   const changePageNo = (num) => {
     setCurPage((prev) => {
@@ -87,9 +88,22 @@ const MainContent = () => {
   };
 
   const insertBooksToShow = () => {
+    let sortedBooks = [...bookData];
+    if (sortConfig.key !== null) {
+      sortedBooks.sort((a, b) => {
+        if (a[sortConfig.key] < b[sortConfig.key]) {
+          return sortConfig.direction === "asc" ? -1 : 1;
+        }
+        if (a[sortConfig.key] > b[sortConfig.key]) {
+          return sortConfig.direction === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+
     const start = curPage * pages;
-    const end = Math.min(start + pages, bookData.length);
-    setBooksToShow(bookData.slice(start, end));
+    const end = Math.min(start + pages, sortedBooks.length);
+    setBooksToShow(sortedBooks.slice(start, end));
   };
 
   const calculateNoPages = () => {
@@ -98,7 +112,15 @@ const MainContent = () => {
 
   const selectCount = (count) => {
     setPages(count);
-    setCurPage(0); // Reset to the first page when changing the number of items per page
+    setCurPage(0); 
+  };
+
+  const requestSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
   };
 
   if (loading) {
@@ -116,18 +138,20 @@ const MainContent = () => {
         </div>
         <div className="w-full mt-8 flex justify-between ">
           <div className="flex gap-10">
-            <div className=" py-1 border-b-orange-400 border-b-4">
-              All Books
-            </div>
-            <div className=" py-1">Popular</div>
-            <div className=" py-1">Latest</div>
+            <div className="py-1 border-b-orange-400 border-b-4">All Books</div>
+            <div className="py-1">Popular</div>
+            <div className="py-1">Latest</div>
           </div>
           <div className="flex gap-4 justify-center items-center">
             <div
               onClick={() => {
                 selectCount(10);
               }}
-              className={pages === 10 ? "bg-[#8C7263] rounded-md px-4 py-1 text-white cursor-pointer" : "bg-[#F6F2F0] rounded-md px-4 py-1 cursor-pointer"}
+              className={
+                pages === 10
+                  ? "bg-[#8C7263] rounded-md px-4 py-1 text-white cursor-pointer"
+                  : "bg-[#F6F2F0] rounded-md px-4 py-1 cursor-pointer"
+              }
             >
               10
             </div>
@@ -135,7 +159,11 @@ const MainContent = () => {
               onClick={() => {
                 selectCount(20);
               }}
-              className={pages === 20 ? "bg-[#8C7263] rounded-md px-4 py-1 text-white cursor-pointer" : "bg-[#F6F2F0] rounded-md px-4 py-1 cursor-pointer"}
+              className={
+                pages === 20
+                  ? "bg-[#8C7263] rounded-md px-4 py-1 text-white cursor-pointer"
+                  : "bg-[#F6F2F0] rounded-md px-4 py-1 cursor-pointer"
+              }
             >
               20
             </div>
@@ -143,7 +171,11 @@ const MainContent = () => {
               onClick={() => {
                 selectCount(50);
               }}
-              className={pages === 50 ? "bg-[#8C7263] rounded-md px-4 py-1 text-white cursor-pointer" : "bg-[#F6F2F0] rounded-md px-4 py-1 cursor-pointer"}
+              className={
+                pages === 50
+                  ? "bg-[#8C7263] rounded-md px-4 py-1 text-white cursor-pointer"
+                  : "bg-[#F6F2F0] rounded-md px-4 py-1 cursor-pointer"
+              }
             >
               50
             </div>
@@ -151,14 +183,18 @@ const MainContent = () => {
               onClick={() => {
                 selectCount(100);
               }}
-              className={pages === 100 ? "bg-[#8C7263] rounded-md px-4 py-1 text-white cursor-pointer" : "bg-[#F6F2F0] rounded-md px-4 py-1 cursor-pointer"}
+              className={
+                pages === 100
+                  ? "bg-[#8C7263] rounded-md px-4 py-1 text-white cursor-pointer"
+                  : "bg-[#F6F2F0] rounded-md px-4 py-1 cursor-pointer"
+              }
             >
               100
             </div>
           </div>
           <div className="w-fit">
             <input
-              className="w-[250px] outline-none "
+              className="w-[250px] outline-none"
               placeholder="type what you are looking for.."
               type="text"
             />
@@ -169,25 +205,19 @@ const MainContent = () => {
         </div>
         <div className="w-full h-full border rounded-lg my-2 border-[rgb(140,114,99)] relative overflow-x-hidden">
           <div className="grid grid-cols-11 border-b border-b-[#8C7263] absolute w-full">
-            <div className="bg-[#F6F2F0] py-2 text-[#8C7263] px-4">S.No.</div>
-            <div className="bg-[#F6F2F0] py-2 text-[#8C7263] px-4 col-span-2">
-              Title
-            </div>
-            <div className="bg-[#F6F2F0] py-2 text-[#8C7263] px-4 ">Author</div>
-            <div className="bg-[#F6F2F0] py-2 text-[#8C7263] px-4 col-span-2">
-              Subject
-            </div>
-            <div className="bg-[#F6F2F0] py-2 text-[#8C7263] px-4">
-              Published
-            </div>
-            <div className="bg-[#F6F2F0] py-2 text-[#8C7263] px-4">Birth</div>
-            <div className="bg-[#F6F2F0] py-2 text-[#8C7263] px-4">Ratings</div>
-            <div className="bg-[#F6F2F0] py-2 text-[#8C7263] px-4 col-span-2">
-              Topwork
-            </div>
+            <div className="bg-[#F6F2F0] py-2 text-[#8C7263] px-4 cursor-pointer" onClick={() => requestSort("sno")}>S.No.</div>
+            <div className="bg-[#F6F2F0] py-2 text-[#8C7263] px-4 col-span-2 cursor-pointer" onClick={() => requestSort("title")}>Title</div>
+            <div className="bg-[#F6F2F0] py-2 text-[#8C7263] px-4 cursor-pointer" onClick={() => requestSort("author")}>Author</div>
+            <div className="bg-[#F6F2F0] py-2 text-[#8C7263] px-4 col-span-2 cursor-pointer" onClick={() => requestSort("subject")}>Subject</div>
+            <div className="bg-[#F6F2F0] py-2 text-[#8C7263] px-4 cursor-pointer" onClick={() => requestSort("published")}>Published</div>
+            <div className="bg-[#F6F2F0] py-2 text-[#8C7263] px-4 cursor-pointer" onClick={() => requestSort("birth")}>Birth</div>
+            <div className="bg-[#F6F2F0] py-2 text-[#8C7263] px-4 cursor-pointer" onClick={() => requestSort("rating")}>Ratings</div>
+            <div className="bg-[#F6F2F0] py-2 text-[#8C7263] px-4 col-span-2 cursor-pointer" onClick={() => requestSort("topwork")}>Topwork</div>
+          </div>
+          <div className="w-full">
+          <div className="bg-[#F6F2F0] py-2 text-[#8C7263] px-4 cursor-pointer ">S.No.</div>
           </div>
           <div className="w-full h-full overflow-y-scroll scrollbar-hide">
-            <div className="py-2 px-4 ">blank div</div>
             {booksToShow?.map((ele, index) => (
               <ListItem
                 key={index}
@@ -204,9 +234,23 @@ const MainContent = () => {
           </div>
         </div>
         <div className="flex justify-between w-1/6 m-auto mb-2">
-          <div onClick={() => { changePageNo(-1); }} className="text-[#8C7263] px-4 py-1 rounded-md bg-[#F6F2F0] cursor-pointer">Prev</div>
+          <div
+            onClick={() => {
+              changePageNo(-1);
+            }}
+            className="text-[#8C7263] px-4 py-1 rounded-md bg-[#F6F2F0] cursor-pointer"
+          >
+            Prev
+          </div>
           <div className="bg-[#8C7263] px-4 py-1 rounded-md text-white">{curPage + 1}</div>
-          <div onClick={() => { changePageNo(1); }} className="text-[#8C7263] px-4 py-1 rounded-md bg-[#F6F2F0] cursor-pointer">Next</div>
+          <div
+            onClick={() => {
+              changePageNo(1);
+            }}
+            className="text-[#8C7263] px-4 py-1 rounded-md bg-[#F6F2F0] cursor-pointer"
+          >
+            Next
+          </div>
         </div>
       </div>
     </div>
