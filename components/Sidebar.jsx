@@ -1,4 +1,4 @@
-"use client";
+
 import Image from "next/image";
 import Logo from "@/public/Logo.svg";
 const Sidebar = () => {
@@ -6,7 +6,7 @@ const Sidebar = () => {
     <div className="w-full bg-[#F6F2F0] h-screen py-4">
       <div className="w-full h-fit">
         <Image className="mx-4" width={40} height={40} src={Logo} />
-        <div className="flex flex-col gap-6 mt-10 px-4">
+        <div className="flex flex-col gap-6 mt-[52px] px-4">
           <div className="flex justify-start items-center gap-2">
             <svg
               width="25px"
@@ -31,7 +31,7 @@ const Sidebar = () => {
                 ></path>{" "}
               </g>
             </svg>
-            <p className="font-medium" >Home</p>
+            <p className="font-medium text" >Home</p>
           </div>
           <div className="flex justify-start items-center gap-2">
             <svg

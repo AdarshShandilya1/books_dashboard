@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <>
       <div className="flex w-full">
-        <div className="w-[20%]">
+        <div className="w-[15%]">
           <Sidebar />
         </div>
         <div className="flex flex-col w-full h-screen">
